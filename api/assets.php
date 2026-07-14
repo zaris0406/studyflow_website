@@ -6,8 +6,17 @@ require __DIR__ . '/storage.php';
 $user = require_role(['teacher', 'admin']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $stmt = db()->prepare('select id, name, asset_type, mime_type, size_bytes, url, alt_text, created_at from assets where owner_id = ? order by created_at desc');
-    $stmt->execute([$user['id']]);
+    $limit = max(1, min(500, (int)($_GET['limit'] ?? 200)));
+    $cloudOnly = (string)($_GET['cloud'] ?? '') === '1';
+    $sql = 'select id, name, asset_type, mime_type, size_bytes, url, alt_text, created_at from assets where owner_id = ?';
+    $params = [$user['id']];
+    if ($cloudOnly) {
+        $sql .= " and url like ?";
+        $params[] = 'https://res.cloudinary.com/%';
+    }
+    $sql .= ' order by created_at desc limit ' . $limit;
+    $stmt = db()->prepare($sql);
+    $stmt->execute($params);
     respond(['assets' => $stmt->fetchAll()]);
 }
 

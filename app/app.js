@@ -1836,13 +1836,30 @@ function applyAccountProfile(profile) {
 }
 
 async function apiRequest(path, options = {}) {
+  const { timeoutMs = 45000, ...fetchOptions } = options;
+  const controller =
+    timeoutMs > 0 && !fetchOptions.signal ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), timeoutMs)
+    : null;
   const response = await fetch(`/api/${path}`, {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      ...(options.headers || {}),
+      ...(fetchOptions.headers || {}),
     },
-    ...options,
+    ...fetchOptions,
+    ...(controller ? { signal: controller.signal } : {}),
+  }).catch((error) => {
+    if (error?.name === "AbortError") {
+      const timeoutError = new Error(`API timeout sau ${Math.round(timeoutMs / 1000)} giây: ${path}`);
+      timeoutError.code = "API_TIMEOUT";
+      timeoutError.status = 0;
+      throw timeoutError;
+    }
+    throw error;
+  }).finally(() => {
+    if (timeoutId) window.clearTimeout(timeoutId);
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -2246,14 +2263,17 @@ async function createCourseMediaUploadContext() {
   const localAssets = (state.assets || []).map((asset) => ({ ...asset }));
   let backendAssets = [];
   try {
-    const data = await apiRequest("assets.php");
+    const data = await apiRequest("assets.php?cloud=1&limit=80", {
+      timeoutMs: 8000,
+    });
     backendAssets = Array.isArray(data.assets)
       ? data.assets.map(normalizeBackendAssetForRepair)
       : [];
   } catch (error) {
     console.warn("Could not load backend assets for media repair", error);
+    return { localAssets, backendAssets, metadataError: error };
   }
-  return { localAssets, backendAssets };
+  return { localAssets, backendAssets, metadataError: null };
 }
 
 function countUploadableCourseMedia(course, assetRecords = state.assets) {
@@ -2513,10 +2533,21 @@ async function publishAllLocalCoursesToBackend(onProgress = () => {}) {
     type: "metadata-start",
   });
   const assetContext = await createCourseMediaUploadContext();
-  onProgress("Đã tải asset metadata từ backend.", {
-    type: "metadata-done",
-    advance: 1,
-  });
+  if (assetContext.metadataError) {
+    onProgress(
+      `Bỏ qua asset metadata vì lỗi: ${formatUploadError(assetContext.metadataError)}`,
+      {
+        type: "metadata-skip",
+        code: assetContext.metadataError.code || "",
+        advance: 1,
+      },
+    );
+  } else {
+    onProgress("Đã tải asset metadata từ backend.", {
+      type: "metadata-done",
+      advance: 1,
+    });
+  }
   const results = [];
   for (const [index, courseId] of courseIds.entries()) {
     const course = state.customCourses.find((item) => item.id === courseId);

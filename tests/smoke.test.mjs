@@ -323,12 +323,12 @@ const checks = [
   {
     name: "Deploy cache bust token is current",
     pass: () =>
-      read("app/index.html").includes("styles.css?v=20260714-upload-progress1") &&
+      read("app/index.html").includes("styles.css?v=20260714-upload-progress2") &&
       read("app/index.html").includes(
         "studyflow-resend.css?v=20260713-resend2",
       ) &&
       read("app/index.html").includes(
-        "app.js?v=20260714-upload-progress1",
+        "app.js?v=20260714-upload-progress2",
       ),
   },
   {
@@ -338,6 +338,9 @@ const checks = [
       read("app/app.js").includes("estimatePublishAllUploadSteps") &&
       read("app/app.js").includes("adminUploadProgressPanel") &&
       read("app/app.js").includes("formatUploadError") &&
+      read("app/app.js").includes("assets.php?cloud=1&limit=80") &&
+      read("app/app.js").includes("API_TIMEOUT") &&
+      read("api/assets.php").includes("limit ' . $limit") &&
       read("app/styles.css").includes(".upload-progress-bar") &&
       read("app/styles.css").includes(".upload-log-item.error"),
   },
