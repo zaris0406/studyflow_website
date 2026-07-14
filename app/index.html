@@ -1,0 +1,1303 @@
+﻿<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StudyFlow LMS</title>
+    <meta
+      name="description"
+      content="StudyFlow LMS là nền tảng học tập cá nhân hóa, giúp học viên theo lộ trình riêng, làm quiz, theo dõi deadline và nhận chứng nhận khi hoàn thành khóa học."
+    />
+    <link rel="canonical" href="https://zaovietknives.com/" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="StudyFlow LMS" />
+    <meta
+      property="og:title"
+      content="StudyFlow LMS - Nền tảng học tập cá nhân hóa"
+    />
+    <meta
+      property="og:description"
+      content="Học theo lộ trình riêng, làm quiz có phản hồi tức thì, theo dõi deadline và nhận chứng nhận khi hoàn thành khóa học."
+    />
+    <meta property="og:url" content="https://zaovietknives.com/" />
+    <meta
+      property="og:image"
+      content="https://zaovietknives.com/assets/studyflow-galaxy.png"
+    />
+    <meta
+      property="og:image:secure_url"
+      content="https://zaovietknives.com/assets/studyflow-galaxy.png"
+    />
+    <meta
+      property="og:image:alt"
+      content="StudyFlow LMS learning dashboard preview"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="StudyFlow LMS - Nền tảng học tập cá nhân hóa"
+    />
+    <meta
+      name="twitter:description"
+      content="Học theo lộ trình riêng, làm quiz có phản hồi tức thì, theo dõi deadline và nhận chứng nhận khi hoàn thành khóa học."
+    />
+    <meta
+      name="twitter:image"
+      content="https://zaovietknives.com/assets/studyflow-galaxy.png"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=20260714-cloudinary-media1" />
+    <link rel="stylesheet" href="./studyflow-resend.css?v=20260713-resend2" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Dieu huong chinh">
+        <a class="brand" href="#home" aria-label="StudyFlow">
+          <span class="brand-mark">S</span>
+          <span>StudyFlow</span>
+        </a>
+        <nav class="nav">
+          <a href="#catalog" data-nav="catalog">
+            <span class="icon icon-grid" aria-hidden="true"></span>
+            Courses
+          </a>
+          <a href="#daily" data-nav="daily">
+            <span class="icon icon-check" aria-hidden="true"></span>
+            Today
+          </a>
+          <a href="#classrooms" data-nav="classrooms">
+            <span class="icon icon-grid" aria-hidden="true"></span>
+            Classrooms
+          </a>
+          <a href="#studio" data-nav="studio">
+            <span class="icon icon-pen" aria-hidden="true"></span>
+            Studio
+          </a>
+          <a href="#account" data-nav="account">
+            <span class="icon icon-user" aria-hidden="true"></span>
+            Account
+          </a>
+          <a href="#settings" data-nav="settings">
+            <span class="icon icon-check" aria-hidden="true"></span>
+            Settings
+          </a>
+        </nav>
+        <div class="profile-mini">
+          <div class="avatar">A</div>
+          <div>
+            <strong id="profileName">An Nguyen</strong>
+            <span id="profileRole">Học sinh</span>
+          </div>
+          <button
+            class="mini-logout-button"
+            id="logoutButton"
+            type="button"
+            onclick="event.stopImmediatePropagation(); window.studyflowLogout ? window.studyflowLogout() : (localStorage.removeItem('studyflow-state-v1'), location.hash='login', location.reload())"
+          >
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="pageKicker">Learning system</p>
+            <h1 id="pageTitle">Courses</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-button" id="checkInButton" type="button">
+              <span class="icon icon-flame" aria-hidden="true"></span>
+              <span id="streakLabel">0 day</span>
+            </button>
+            <button class="primary-button" id="continueButton" type="button">
+              <span class="icon icon-play" aria-hidden="true"></span>
+              Continue
+            </button>
+          </div>
+        </header>
+
+        <section id="viewRoot" class="view-root" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <template id="homeTemplate">
+      <section class="landing-page">
+        <nav class="landing-nav">
+          <a class="landing-brand" href="#home">
+            <span class="brand-mark">S</span>
+            <strong>StudyFlow</strong>
+          </a>
+          <div class="landing-nav-links" aria-label="Landing sections">
+            <a href="#home-program" data-home-scroll="home-program"
+              >Chương trình</a
+            >
+            <a href="#home-backed" data-home-scroll="home-backed">Backed by</a>
+            <a href="#home-about" data-home-scroll="home-about">About</a>
+          </div>
+          <button
+            class="landing-outline-button"
+            id="goDashboardButton"
+            type="button"
+          >
+            Get started
+          </button>
+        </nav>
+        <div class="landing-hero">
+          <div class="landing-copy">
+            <p class="landing-kicker landing-hero-kicker">
+              NỀN TẢNG HỌC TẬP CHO NGƯỜI VIỆT
+            </p>
+            <h1>StudyFlow</h1>
+            <p class="landing-hero-tagline">Học. Kết nối. Tiến bộ.</p>
+            <p class="landing-subtitle">
+              Lộ trình rõ ràng, quiz phản hồi tức thì và công cụ giúp bạn duy
+              trì nhịp học mỗi ngày.
+            </p>
+            <div class="landing-actions">
+              <button
+                class="landing-primary-button"
+                type="button"
+                data-register-role="student"
+              >
+                Tạo tài khoản học viên
+              </button>
+              <button
+                class="landing-secondary-button"
+                type="button"
+                data-register-role="teacher"
+              >
+                Tạo tài khoản giảng viên
+              </button>
+            </div>
+            <a class="landing-login-link" href="#login"
+              >Đã có tài khoản? Đăng nhập</a
+            >
+            <div class="landing-hero-stats" aria-label="Thống kê nền tảng">
+              <span><strong>3+</strong> lộ trình</span>
+              <span><strong>170+</strong> tác vụ học</span>
+              <span><strong>3</strong> vai trò</span>
+              <span><strong>24/7</strong> truy cập</span>
+            </div>
+          </div>
+          <img
+            class="landing-hero-scene"
+            src="./assets/studyflow-galaxy.png"
+            alt="Không gian học tập số StudyFlow"
+          />
+          <div
+            class="landing-product-preview"
+            aria-label="Xem trước thống kê học tập StudyFlow"
+          >
+            <div class="landing-preview-bar">
+              <span>StudyFlow workspace</span>
+              <span>Learning analytics</span>
+            </div>
+            <img
+              src="./assets/studyflow-learning-chart.png"
+              alt="Bảng thống kê hiệu quả học tập trong StudyFlow"
+            />
+          </div>
+        </div>
+        <section class="landing-proof-band" id="home-program">
+          <div class="landing-proof-copy">
+            <p class="landing-kicker landing-proof-kicker">
+              TẠI SAO LÀ STUDYFLOW?
+            </p>
+            <h2>Học tập theo lộ trình riêng, chất lượng đảm bảo.</h2>
+            <div class="landing-proof-stats">
+              <strong><b>3</b><span>khóa học nền tảng</span></strong>
+              <strong><b>170+</b><span>tác vụ học tập mẫu</span></strong>
+              <strong><b>1.0x</b><span>lộ trình cá nhân hóa</span></strong>
+              <strong><b>87%</b><span>phạm vi đề tham khảo</span></strong>
+            </div>
+          </div>
+          <div
+            class="learning-system"
+            aria-label="Hệ thống học tập StudyFlow gồm bốn giai đoạn"
+          >
+            <div class="learning-system-header">
+              <span>STUDYFLOW / LEARNING SYSTEM</span>
+              <span class="system-status"
+                ><i aria-hidden="true"></i>ACTIVE</span
+              >
+            </div>
+            <ol class="learning-system-flow">
+              <li class="learning-system-node">
+                <span class="system-step">01</span>
+                <div>
+                  <span class="system-name">FOUNDATION</span>
+                  <strong>3</strong>
+                  <p>khóa học nền tảng</p>
+                </div>
+              </li>
+              <li class="learning-system-node">
+                <span class="system-step">02</span>
+                <div>
+                  <span class="system-name">PRACTICE LIBRARY</span>
+                  <strong>170+</strong>
+                  <p>tác vụ học tập mẫu</p>
+                </div>
+              </li>
+              <li class="learning-system-node">
+                <span class="system-step">03</span>
+                <div>
+                  <span class="system-name">PERSONAL PATH</span>
+                  <strong>1.0x</strong>
+                  <p>lộ trình cá nhân hóa</p>
+                </div>
+              </li>
+              <li class="learning-system-node">
+                <span class="system-step">04</span>
+                <div>
+                  <span class="system-name">EXAM RANGE</span>
+                  <strong>87%</strong>
+                  <p>phạm vi đề tham khảo</p>
+                </div>
+              </li>
+            </ol>
+            <div class="learning-system-footer">
+              <span>INPUT / FOUNDATION</span>
+              <span>OUTPUT / EXAM RANGE</span>
+            </div>
+          </div>
+        </section>
+        <section class="landing-builder-section">
+          <div>
+            <p class="landing-kicker">Your learning, your way</p>
+            <h2>
+              Bảng học tập gom khóa học, nhiệm vụ, deadline và ghi chú vào cùng
+              một nơi.
+            </h2>
+          </div>
+          <div
+            class="studyflow-dashboard"
+            aria-label="Bản xem trước bảng học tập StudyFlow"
+          >
+            <aside class="dashboard-sidebar">
+              <div class="dashboard-product-mark" aria-hidden="true">S</div>
+              <nav aria-label="Điều hướng bảng học tập mẫu">
+                <span class="dashboard-nav-item active"
+                  ><i class="icon icon-grid" aria-hidden="true"></i>Tổng
+                  quan</span
+                >
+                <span class="dashboard-nav-item"
+                  ><i class="icon icon-play" aria-hidden="true"></i>Khóa
+                  học</span
+                >
+                <span class="dashboard-nav-item"
+                  ><i class="icon icon-check" aria-hidden="true"></i>Nhiệm
+                  vụ</span
+                >
+                <span class="dashboard-nav-item"
+                  ><i class="icon icon-pen" aria-hidden="true"></i>Ghi chú</span
+                >
+              </nav>
+              <span class="dashboard-sidebar-meta">LEARNING / 04</span>
+            </aside>
+            <div class="dashboard-main">
+              <div class="dashboard-main-heading">
+                <div>
+                  <span class="dashboard-mono">TỔNG QUAN</span>
+                  <h3>Lộ trình của bạn</h3>
+                </div>
+                <span class="dashboard-avatar" aria-label="Tài khoản học viên"
+                  >AN</span
+                >
+              </div>
+              <article class="dashboard-course-card">
+                <div class="dashboard-course-topline">
+                  <span class="dashboard-chip learning">Đang học</span>
+                  <span class="dashboard-mono">BÀI 04 / 08</span>
+                </div>
+                <p>Khóa học nền tảng</p>
+                <h4>Bài 04: Quản lý tiến độ</h4>
+                <div class="dashboard-progress" aria-label="Tiến độ bài học">
+                  <span></span>
+                </div>
+                <div class="dashboard-course-actions">
+                  <span>Tiếp tục đúng vị trí đã dừng</span>
+                  <a href="#catalog">Tiếp tục học</a>
+                </div>
+              </article>
+              <section
+                class="dashboard-task-list"
+                aria-labelledby="dashboardTasksTitle"
+              >
+                <div class="dashboard-section-heading">
+                  <h4 id="dashboardTasksTitle">Nhiệm vụ gần nhất</h4>
+                  <span>3 mục</span>
+                </div>
+                <div class="dashboard-task-row">
+                  <span class="task-check complete" aria-hidden="true">✓</span>
+                  <div>
+                    <strong>Hoàn thành ghi chú</strong
+                    ><small>Khóa học nền tảng</small>
+                  </div>
+                  <span class="dashboard-chip done">Đã hoàn thành</span>
+                </div>
+                <div class="dashboard-task-row">
+                  <span class="task-check" aria-hidden="true"></span>
+                  <div>
+                    <strong>Quiz ôn tập</strong><small>Bài 04 · 10 phút</small>
+                  </div>
+                  <span class="dashboard-chip todo">Cần làm</span>
+                </div>
+                <div class="dashboard-task-row">
+                  <span class="task-check" aria-hidden="true"></span>
+                  <div>
+                    <strong>Đọc phản hồi bài học</strong
+                    ><small>Phản hồi từ giảng viên</small>
+                  </div>
+                  <span class="dashboard-chip learning">Đang học</span>
+                </div>
+              </section>
+            </div>
+            <aside class="dashboard-context">
+              <section class="dashboard-context-card deadline">
+                <span class="dashboard-mono">DEADLINE SẮP TỚI</span>
+                <strong>Quiz ôn tập</strong>
+                <p>Thứ Sáu</p>
+                <span class="dashboard-chip todo">Cần làm</span>
+              </section>
+              <section class="dashboard-context-card">
+                <span class="dashboard-mono">GHI CHÚ GẦN ĐÂY</span>
+                <strong>Quản lý tiến độ</strong>
+                <p>Chia mục tiêu lớn thành từng bước học nhỏ, rõ ràng.</p>
+                <a href="#daily">Mở ghi chú</a>
+              </section>
+              <section class="dashboard-context-card compact">
+                <span class="dashboard-mono">QUIZ HÔM NAY</span>
+                <strong>Ôn tập nền tảng</strong>
+              </section>
+            </aside>
+          </div>
+        </section>
+        <section
+          class="landing-feature-section landing-feature-rebuild"
+          id="home-difference"
+        >
+          <div class="landing-feature-heading">
+            <p class="landing-kicker landing-feature-statement">
+              <span aria-hidden="true"></span>Những điều khiến StudyFlow khác
+              biệt
+            </p>
+            <div class="landing-feature-intro">
+              <h2>StudyFlow có gì để học?</h2>
+              <p>
+                Không chỉ là khóa học, StudyFlow gom lộ trình, quiz, deadline và
+                phản hồi học tập vào một hệ thống tự học rõ ràng.
+              </p>
+            </div>
+          </div>
+          <div
+            class="landing-feature-grid"
+            id="landingFeatureTabs"
+            aria-label="Những điều khiến StudyFlow khác biệt"
+          >
+            <button
+              type="button"
+              class="landing-feature-card"
+              data-feature="quality"
+            >
+              <span class="feature-card-mark">01</span>
+              <strong>Chất lượng</strong>
+              <span
+                >Giáo trình có kiểm chứng, đi từ nền tảng tới thực hành.</span
+              >
+            </button>
+            <button
+              type="button"
+              class="landing-feature-card"
+              data-feature="path"
+            >
+              <span class="feature-card-mark">02</span>
+              <strong>Lộ trình linh hoạt</strong>
+              <span>Học theo nhịp riêng, tiếp tục đúng nơi đã dừng.</span>
+            </button>
+            <button
+              type="button"
+              class="landing-feature-card"
+              data-feature="exam"
+            >
+              <span class="feature-card-mark">03</span>
+              <strong>Ôn thi tốc độ</strong>
+              <span>Quiz theo dạng đề, luyện nhanh từng nhóm kỹ năng.</span>
+            </button>
+            <button
+              type="button"
+              class="landing-feature-card"
+              data-feature="support"
+            >
+              <span class="feature-card-mark">04</span>
+              <strong>Tận tình</strong>
+              <span>Giảng viên và cộng đồng hỗ trợ khi bạn kẹt bài.</span>
+            </button>
+          </div>
+          <div
+            class="landing-feature-detail"
+            id="landingFeatureDetail"
+            aria-live="polite"
+          ></div>
+        </section>
+        <section class="backed-section" id="home-backed" aria-label="Backed by">
+          <p class="landing-kicker">Backed by</p>
+          <div class="partner-marquee">
+            <div class="partner-track">
+              <div class="partner-logo">
+                <img src="./assets/partner-fpt.png" alt="FPT University" />
+              </div>
+              <div class="partner-logo">
+                <img src="./assets/partner-binance.png" alt="Binance" />
+              </div>
+              <div class="partner-logo partner-text-logo">
+                <strong>Thầy HùngLD</strong><span>Mentor</span>
+              </div>
+              <div class="partner-logo">
+                <img src="./assets/partner-fpt.png" alt="FPT University" />
+              </div>
+              <div class="partner-logo">
+                <img src="./assets/partner-binance.png" alt="Binance" />
+              </div>
+              <div class="partner-logo partner-text-logo">
+                <strong>Thầy HùngLD</strong><span>Mentor</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="about-section" id="home-about">
+          <div>
+            <p class="landing-kicker">Về chúng tôi</p>
+            <h2>StudyFlow đồng hành cùng người học Việt Nam</h2>
+          </div>
+          <p>
+            Từ năm nhất, khi tự trải qua các mô hình tự học ở nước ngoài, anh
+            L.T.K - Nhóm trưởng đã nhận ra rằng, thật sự những mô hình đó không
+            hề hoàn hảo. Những chiêu bài thu phí, những bài giảng vô nghĩa sặc
+            mùi kiếm tiền, bòn rút học sinh đã làm những học sinh kinh tế không
+            tốt hầu như không có một môi trường tự học phát triển. Nhận ra những
+            điều đó, StudyFlow đã tới, mang sứ mệnh tiên phong là một mô hình
+            học tập phi tập trung, mọi bài giảng đều được đóng góp, sẽ miễn phí
+            với chất lượng cao nhất tới mọi người.
+          </p>
+        </section>
+        <section class="contact-section">
+          <div>
+            <p class="landing-kicker">Liên hệ kỹ thuật</p>
+            <h2>Hỗ trợ vận hành nền tảng</h2>
+          </div>
+          <dl class="contact-grid">
+            <div class="contact-item">
+              <dt>Dev</dt>
+              <dd>Lê (Zaris) Tuấn Kiệt</dd>
+            </div>
+            <div class="contact-item">
+              <dt>SĐT</dt>
+              <dd><a href="tel:+84945419867">0945419867</a></dd>
+            </div>
+            <div class="contact-item">
+              <dt>Email</dt>
+              <dd>
+                <a href="mailto:feedsemilate@gmail.com"
+                  >feedsemilate@gmail.com</a
+                >
+              </dd>
+            </div>
+            <div class="contact-item contact-address">
+              <dt>Địa chỉ</dt>
+              <dd>Tòa Safira - S6B5, Khu công nghệ cao TP-HCM.</dd>
+            </div>
+          </dl>
+        </section>
+      </section>
+    </template>
+
+    <template id="catalogTemplate">
+      <section class="catalog-layout">
+        <div class="catalog-overview" id="catalogOverview"></div>
+        <div class="filter-panel">
+          <label class="search-box">
+            <span class="icon icon-search" aria-hidden="true"></span>
+            <input
+              id="courseSearch"
+              type="search"
+              placeholder="Search courses"
+            />
+          </label>
+          <div class="filter-row" id="subjectFilters"></div>
+        </div>
+        <div class="advanced-filters">
+          <select id="difficultyFilter" aria-label="Difficulty filter">
+            <option value="All">All difficulties</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+          <select id="durationFilter" aria-label="Duration filter">
+            <option value="All">Any duration</option>
+            <option value="short">Short under 20 min</option>
+            <option value="medium">Medium 20-45 min</option>
+            <option value="long">Long 45+ min</option>
+          </select>
+          <select id="sortFilter" aria-label="Sort courses">
+            <option value="recommended">Recommended</option>
+            <option value="rating">Highest rated</option>
+            <option value="progress">In progress</option>
+            <option value="newest">Newest</option>
+          </select>
+        </div>
+        <div class="recommendation-panel" id="recommendationPanel"></div>
+        <div class="course-grid" id="courseGrid"></div>
+      </section>
+    </template>
+
+    <template id="courseTemplate">
+      <section class="course-layout">
+        <div class="course-summary" id="courseSummary"></div>
+        <div class="course-main">
+          <div class="level-map" id="levelMap"></div>
+          <div class="community-panel" id="courseCommunity"></div>
+        </div>
+      </section>
+    </template>
+
+    <template id="lessonTemplate">
+      <section class="lesson-shell">
+        <div class="lesson-progress">
+          <button
+            class="icon-button"
+            id="exitLessonButton"
+            type="button"
+            aria-label="Close lesson"
+          >
+            <span class="icon icon-x" aria-hidden="true"></span>
+          </button>
+          <div class="progress-track">
+            <div id="lessonProgressBar"></div>
+          </div>
+          <span id="lessonScorePill" class="score-pill">0%</span>
+        </div>
+        <article class="lesson-card" id="lessonCard"></article>
+        <section
+          class="community-panel lesson-community"
+          id="lessonCommunity"
+        ></section>
+      </section>
+    </template>
+
+    <template id="dailyTemplate">
+      <section class="daily-layout">
+        <div class="today-panel" id="todayPanel"></div>
+
+        <div class="plan-panel" id="planPanel"></div>
+
+        <div class="task-panel">
+          <form id="taskForm" class="task-form">
+            <input
+              id="taskInput"
+              type="text"
+              placeholder="Add a daily task"
+              required
+            />
+            <select id="taskPriority" aria-label="Task priority">
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+            <select
+              id="taskLink"
+              aria-label="Link task to course or lesson"
+            ></select>
+            <button class="primary-button" type="submit">
+              <span class="icon icon-plus" aria-hidden="true"></span>
+              Add
+            </button>
+          </form>
+          <div id="taskList" class="task-list"></div>
+        </div>
+
+        <div class="note-panel">
+          <div class="split-fields">
+            <label>
+              Mood
+              <select id="dailyMood">
+                <option value="focused">Focused</option>
+                <option value="steady">Steady</option>
+                <option value="tired">Tired</option>
+                <option value="stuck">Stuck</option>
+              </select>
+            </label>
+            <label>
+              Focus minutes
+              <input
+                id="focusMinutes"
+                type="number"
+                min="0"
+                max="480"
+                step="5"
+                value="0"
+              />
+            </label>
+          </div>
+          <label for="dailyNote">Daily note</label>
+          <textarea
+            id="dailyNote"
+            rows="8"
+            placeholder="Today I learned..."
+          ></textarea>
+        </div>
+
+        <div class="calendar-panel" id="calendarPanel"></div>
+        <div class="goal-panel" id="goalPanel"></div>
+      </section>
+    </template>
+
+    <template id="studioTemplate">
+      <section class="studio-layout">
+        <div class="studio-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Creator studio</p>
+              <h2>Draft course</h2>
+            </div>
+            <span class="status-pill">Pending review</span>
+          </div>
+          <form id="studioForm" class="studio-form">
+            <label>
+              Course title
+              <input
+                id="studioTitle"
+                type="text"
+                value="Intro to Study Habits"
+              />
+            </label>
+            <div class="split-fields">
+              <label>
+                Subject
+                <input id="studioSubject" type="text" value="Productivity" />
+              </label>
+              <label>
+                Difficulty
+                <select id="studioDifficulty">
+                  <option>Beginner</option>
+                  <option>Intermediate</option>
+                  <option>Advanced</option>
+                </select>
+              </label>
+            </div>
+            <div class="split-fields">
+              <label>
+                Thumbnail image
+                <input id="studioThumbnail" type="file" accept="image/*" />
+              </label>
+              <div class="asset-preview" id="thumbnailPreview"></div>
+            </div>
+            <label>
+              Course description
+              <textarea id="studioDescription" rows="3">
+A short path for building a daily learning habit that is easy to repeat.</textarea
+              >
+            </label>
+
+            <div class="draft-status" id="draftStatus"></div>
+            <div class="creator-gate" id="creatorGate"></div>
+            <div class="asset-library" id="assetLibrary"></div>
+
+            <div class="structure-panel">
+              <div class="builder-header">
+                <div>
+                  <p class="eyebrow">Course structure</p>
+                  <strong>Levels and lessons</strong>
+                </div>
+                <div class="builder-toolbar">
+                  <button
+                    class="ghost-button"
+                    id="addLevelButton"
+                    type="button"
+                  >
+                    Level
+                  </button>
+                  <button
+                    class="ghost-button"
+                    id="addLessonButton"
+                    type="button"
+                  >
+                    Lesson
+                  </button>
+                </div>
+              </div>
+              <div class="structure-grid">
+                <div class="structure-list" id="levelList"></div>
+                <div class="structure-list" id="lessonList"></div>
+              </div>
+              <div class="split-fields">
+                <label>
+                  Selected level title
+                  <input id="selectedLevelTitle" type="text" />
+                </label>
+                <label>
+                  Selected lesson title
+                  <input id="selectedLessonTitle" type="text" />
+                </label>
+              </div>
+              <div class="split-fields">
+                <label>
+                  Lesson minutes
+                  <input
+                    id="selectedLessonMinutes"
+                    type="number"
+                    min="1"
+                    max="90"
+                  />
+                </label>
+                <div class="builder-toolbar">
+                  <button
+                    class="danger-button"
+                    id="removeLevelButton"
+                    type="button"
+                  >
+                    Remove level
+                  </button>
+                  <button
+                    class="danger-button"
+                    id="removeLessonButton"
+                    type="button"
+                  >
+                    Remove lesson
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="builder-header">
+              <div>
+                <p class="eyebrow">Lesson blocks</p>
+                <strong>Build the lesson flow</strong>
+              </div>
+              <div class="builder-toolbar">
+                <button class="ghost-button" id="addTextBlock" type="button">
+                  Text
+                </button>
+                <button class="ghost-button" id="addQuizBlock" type="button">
+                  Quiz
+                </button>
+                <button
+                  class="ghost-button"
+                  id="addReflectionBlock"
+                  type="button"
+                >
+                  Reflection
+                </button>
+                <button class="ghost-button" id="addImageBlock" type="button">
+                  Image
+                </button>
+                <button class="ghost-button" id="addVideoBlock" type="button">
+                  Video
+                </button>
+              </div>
+            </div>
+            <div id="blockBuilder" class="block-builder"></div>
+            <div class="studio-actions">
+              <button class="ghost-button" id="saveDraftButton" type="button">
+                Save draft
+              </button>
+              <button class="danger-button" id="resetDraftButton" type="button">
+                Reset draft
+              </button>
+              <button class="primary-button" type="submit">
+                <span class="icon icon-send" aria-hidden="true"></span>
+                Submit
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="review-panel" id="reviewPanel"></div>
+      </section>
+    </template>
+
+    <template id="classroomTemplate">
+      <section class="classroom-layout">
+        <div class="classroom-panel" id="classroomOverview"></div>
+        <div class="classroom-panel" id="classroomBuilder"></div>
+        <div
+          class="classroom-panel classroom-list-panel"
+          id="classroomList"
+        ></div>
+      </section>
+    </template>
+
+    <template id="accountTemplate">
+      <section class="account-layout">
+        <div
+          class="account-panel account-profile-panel"
+          id="accountProfilePanel"
+        >
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Tài khoản</p>
+              <h2 id="accountPageTitle">Hồ sơ người dùng</h2>
+            </div>
+            <span class="status-pill" id="accountRolePill">Học sinh</span>
+          </div>
+          <form id="accountForm" class="studio-form">
+            <label>
+              Họ và tên
+              <input id="accountName" type="text" />
+            </label>
+            <div class="split-fields">
+              <label>
+                Tuổi
+                <input id="accountAge" type="number" min="1" max="120" />
+              </label>
+              <label>
+                Lớp
+                <input id="accountClassName" type="text" />
+              </label>
+            </div>
+            <label>
+              Trường
+              <input id="accountSchool" type="text" />
+            </label>
+            <label>
+              Email
+              <input id="accountEmail" type="email" />
+            </label>
+            <div class="profile-readonly-row">
+              <span>
+                <strong>Verified email</strong>
+                <small id="emailVerifiedLabel">Chưa xác minh</small>
+              </span>
+              <span class="status-pill">Làm sau</span>
+            </div>
+            <div class="profile-readonly-row">
+              <span>
+                <strong>Password</strong>
+                <small>********</small>
+              </span>
+              <button
+                class="ghost-button"
+                id="changePasswordButton"
+                type="button"
+              >
+                Đổi mật khẩu
+              </button>
+            </div>
+            <div class="password-change-panel" id="passwordChangePanel" hidden>
+              <div class="split-fields">
+                <label>
+                  Mật khẩu hiện tại
+                  <input
+                    id="currentPasswordInput"
+                    type="password"
+                    autocomplete="current-password"
+                  />
+                </label>
+                <label>
+                  Mật khẩu mới
+                  <input
+                    id="newPasswordInput"
+                    type="password"
+                    autocomplete="new-password"
+                  />
+                </label>
+              </div>
+              <div class="data-actions">
+                <button
+                  class="primary-button"
+                  id="savePasswordButton"
+                  type="button"
+                >
+                  Lưu mật khẩu
+                </button>
+                <button
+                  class="ghost-button"
+                  id="cancelPasswordButton"
+                  type="button"
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+            <button class="primary-button" type="submit">Lưu hồ sơ</button>
+          </form>
+          <div
+            class="import-status"
+            id="accountSaveStatus"
+            aria-live="polite"
+          ></div>
+        </div>
+
+        <div
+          class="account-panel account-role-panel"
+          id="roleAccountPanel"
+        ></div>
+      </section>
+    </template>
+
+    <template id="settingsTemplate">
+      <section class="settings-layout">
+        <div class="account-panel system-panel" id="systemPanel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Hệ thống</p>
+              <h2>Trạng thái nền tảng</h2>
+            </div>
+            <span class="status-pill" id="systemStatusPill">checking</span>
+          </div>
+          <div class="auth-summary" id="systemSummary"></div>
+        </div>
+        <div class="account-panel readiness-panel" id="readinessPanel"></div>
+        <div class="account-panel language-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Ngôn ngữ</p>
+              <h2>Ngôn ngữ</h2>
+            </div>
+            <span class="status-pill" id="languageStatusPill">VI</span>
+          </div>
+          <p class="muted-copy">
+            Chọn tiếng Việt hoặc tiếng Anh cho toàn bộ giao diện. Nội dung được
+            lưu UTF-8 để không lỗi dấu tiếng Việt.
+          </p>
+          <div class="segmented-control" id="languageControl">
+            <button type="button" data-language="vi">Tiếng Việt</button>
+            <button type="button" data-language="en">English</button>
+          </div>
+        </div>
+        <div class="account-panel music-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Âm thanh</p>
+              <h2>Nhạc nền</h2>
+            </div>
+            <span class="status-pill">Âm thanh</span>
+          </div>
+          <p class="muted-copy">
+            Upload file nhạc vào host, ví dụ
+            <strong>public_html/assets/music.mp3</strong>, rồi nhập đường dẫn
+            <strong>assets/music.mp3</strong>. Trình duyệt chỉ cho phát sau khi
+            người dùng bấm nút.
+          </p>
+          <div class="music-controls">
+            <input
+              id="musicPathInput"
+              type="text"
+              placeholder="assets/music.mp3"
+            />
+            <button class="primary-button" id="saveMusicButton" type="button">
+              Lưu nhạc
+            </button>
+            <button class="ghost-button" id="toggleMusicButton" type="button">
+              Phát nhạc
+            </button>
+          </div>
+          <div class="import-status" id="musicStatus" aria-live="polite"></div>
+        </div>
+        <div
+          class="account-panel account-role-panel"
+          id="platformAdminSettingsPanel"
+        ></div>
+        <div class="account-panel data-tools-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Sao lưu</p>
+              <h2>Dữ liệu trình duyệt</h2>
+            </div>
+            <span class="status-pill">localStorage</span>
+          </div>
+          <p class="muted-copy">
+            Xuất hoặc nhập dữ liệu đang lưu trong trình duyệt: tiến độ học,
+            task, note, bài giảng nháp và hàng chờ duyệt.
+          </p>
+          <div class="data-actions">
+            <button class="primary-button" id="exportDataButton" type="button">
+              Export JSON
+            </button>
+            <label class="ghost-button data-import-button">
+              Import JSON
+              <input
+                id="importDataInput"
+                type="file"
+                accept="application/json,.json"
+              />
+            </label>
+          </div>
+          <div class="import-status" id="importStatus" aria-live="polite"></div>
+        </div>
+      </section>
+    </template>
+
+    <template id="authTemplate">
+      <section class="auth-page">
+        <div class="auth-shell">
+          <header class="auth-header">
+            <a
+              class="auth-logo"
+              href="#home"
+              aria-label="StudyFlow trang chính"
+            >
+              <span class="brand-mark">S</span>
+              <strong>StudyFlow</strong>
+            </a>
+            <a class="auth-return-button" href="#home">
+              <span aria-hidden="true">←</span>
+              Trang chính
+            </a>
+          </header>
+          <div class="auth-layout">
+            <main class="auth-commerce-form">
+              <div class="auth-page-meta">
+                <span>STUDYFLOW / ACCOUNT</span>
+                <span class="auth-ready-status"
+                  ><i aria-hidden="true"></i>READY</span
+                >
+              </div>
+              <div class="auth-copy-block">
+                <h1 id="authPageTitle">Đăng nhập StudyFlow</h1>
+                <p class="auth-subtitle" id="authPageSubtitle">
+                  Đăng nhập để tiếp tục học tập
+                </p>
+              </div>
+              <form class="auth-form" id="backendLoginForm">
+                <label>
+                  <span>Email</span>
+                  <input
+                    id="backendLoginEmail"
+                    type="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required
+                  />
+                </label>
+                <label>
+                  <span>Mật khẩu</span>
+                  <input
+                    id="backendLoginPassword"
+                    type="password"
+                    placeholder="Mật khẩu của bạn"
+                    autocomplete="current-password"
+                    required
+                  />
+                </label>
+                <button class="auth-submit-button" type="submit">
+                  Đăng nhập
+                </button>
+              </form>
+              <form class="auth-form" id="backendRegisterForm">
+                <p class="auth-card-title" id="registerTitle" hidden>
+                  Tạo tài khoản học viên
+                </p>
+                <input id="backendRegisterRole" type="hidden" value="student" />
+                <label>
+                  <span>Họ và tên</span>
+                  <input
+                    id="backendRegisterName"
+                    type="text"
+                    placeholder="Tên của bạn"
+                    autocomplete="name"
+                    required
+                  />
+                </label>
+                <label>
+                  <span>Email</span>
+                  <input
+                    id="backendRegisterEmail"
+                    type="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required
+                  />
+                </label>
+                <label>
+                  <span>Mật khẩu</span>
+                  <input
+                    id="backendRegisterPassword"
+                    type="password"
+                    placeholder="Ít nhất 8 ký tự"
+                    autocomplete="new-password"
+                    required
+                  />
+                </label>
+                <button class="auth-submit-button" type="submit">
+                  Đăng ký
+                </button>
+              </form>
+              <div class="auth-switch-row">
+                <a href="#register/student" id="authRegisterLink"
+                  >Chưa có tài khoản? Đăng ký ngay</a
+                >
+                <a href="#login" id="authLoginLink"
+                  >Đã có tài khoản? Đăng nhập</a
+                >
+              </div>
+              <div
+                class="import-status auth-status-message"
+                id="authPageStatusMessage"
+                aria-live="polite"
+              ></div>
+            </main>
+            <aside
+              class="auth-preview"
+              aria-label="Bản xem trước không gian học tập StudyFlow"
+            >
+              <div class="auth-preview-header">
+                <span>LEARNING WORKSPACE</span>
+                <span><i aria-hidden="true"></i>ACTIVE</span>
+              </div>
+              <div class="auth-preview-content">
+                <div class="auth-preview-title">
+                  <div>
+                    <span>TỔNG QUAN</span>
+                    <h2>Lộ trình của bạn</h2>
+                  </div>
+                  <span class="auth-preview-avatar" aria-hidden="true">AN</span>
+                </div>
+                <article class="auth-course-preview">
+                  <div class="auth-course-meta">
+                    <span class="auth-preview-chip">Đang học</span>
+                    <span>BÀI 04 / 08</span>
+                  </div>
+                  <p>Khóa học nền tảng</p>
+                  <h3>Bài 04: Quản lý tiến độ</h3>
+                  <div
+                    class="auth-progress-track"
+                    aria-label="Tiến độ khóa học"
+                  >
+                    <span></span>
+                  </div>
+                  <small>Tiếp tục đúng vị trí đã dừng</small>
+                </article>
+                <div class="auth-preview-grid">
+                  <article>
+                    <span>DEADLINE</span>
+                    <strong>Quiz ôn tập</strong>
+                    <small>Thứ Sáu</small>
+                  </article>
+                  <article>
+                    <span>GHI CHÚ</span>
+                    <strong>Quản lý tiến độ</strong>
+                    <small>Vừa cập nhật</small>
+                  </article>
+                  <article>
+                    <span>NHIỆM VỤ</span>
+                    <strong>Hoàn thành ghi chú</strong>
+                    <small class="auth-complete-label">Đã hoàn thành</small>
+                  </article>
+                  <article>
+                    <span>QUIZ HÔM NAY</span>
+                    <strong>Ôn tập nền tảng</strong>
+                    <small>Cần làm</small>
+                  </article>
+                </div>
+              </div>
+              <div class="auth-preview-footer">
+                <span>STUDYFLOW / LEARN</span>
+                <span>WORKSPACE / READY</span>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+    </template>
+
+    <template id="onboardingTemplate">
+      <section class="onboarding-page">
+        <a class="auth-return-button" href="#home">← Trang chính</a>
+        <div class="meteor-layer" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <a class="auth-logo" href="#home">
+          <span class="brand-mark">S</span>
+          <strong>StudyFlow LMS</strong>
+        </a>
+        <div class="onboarding-shell">
+          <div class="onboarding-intro">
+            <p class="landing-kicker">Thiết lập cá nhân</p>
+            <h1>Bắt đầu đúng với bạn</h1>
+            <p>
+              Hoàn thiện hồ sơ học tập và chọn chủ đề bạn quan tâm. StudyFlow sẽ
+              gợi ý khóa học phù hợp ngay sau bước này.
+            </p>
+          </div>
+          <form class="onboarding-card" id="onboardingForm">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Hồ sơ học sinh</p>
+                <h2>Thông tin cá nhân</h2>
+              </div>
+              <span class="status-pill">1/2</span>
+            </div>
+            <label>
+              Họ và tên
+              <input
+                id="onboardingName"
+                type="text"
+                autocomplete="name"
+                required
+              />
+            </label>
+            <div class="split-fields">
+              <label>
+                Tuổi
+                <input id="onboardingAge" type="number" min="1" max="120" />
+              </label>
+              <label>
+                Lớp
+                <input id="onboardingClassName" type="text" />
+              </label>
+            </div>
+            <label>
+              Trường
+              <input id="onboardingSchool" type="text" />
+            </label>
+            <label>
+              Email
+              <input
+                id="onboardingEmail"
+                type="email"
+                autocomplete="email"
+                required
+              />
+            </label>
+
+            <div class="interest-step">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Nhu cầu học</p>
+                  <h2>Bạn muốn học gì?</h2>
+                </div>
+                <span class="status-pill">2/2</span>
+              </div>
+              <div class="interest-grid" id="interestGrid"></div>
+              <div class="recommendation-box">
+                <h3>Khóa học đề xuất</h3>
+                <div
+                  class="account-course-list"
+                  id="onboardingRecommendations"
+                ></div>
+              </div>
+            </div>
+            <button class="primary-button" type="submit">
+              Hoàn tất thiết lập
+            </button>
+            <div
+              class="import-status"
+              id="onboardingStatus"
+              aria-live="polite"
+            ></div>
+          </form>
+        </div>
+      </section>
+    </template>
+
+    <script src="./app.js?v=20260714-cloudinary-media1"></script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+api/config.php
+deploy/
+uploads/
+.DS_Store
+Thumbs.db
+*.log
