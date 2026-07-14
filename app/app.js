@@ -1853,7 +1853,13 @@ async function apiRequest(path, options = {}) {
     ]
       .filter(Boolean)
       .join(" ");
-    throw new Error(message);
+    const error = new Error(message);
+    error.status = response.status;
+    error.code = data.error || "";
+    error.hint = data.hint || "";
+    error.detail = data.detail || "";
+    error.payload = data;
+    throw error;
   }
   return data;
 }
@@ -1878,9 +1884,20 @@ async function apiUploadAssetFile(
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(
+    const message = [
       data.message || data.error || `Upload failed ${response.status}`,
-    );
+      data.hint,
+      data.detail,
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const error = new Error(message);
+    error.status = response.status;
+    error.code = data.error || "";
+    error.hint = data.hint || "";
+    error.detail = data.detail || "";
+    error.payload = data;
+    throw error;
   }
   const asset = normalizeAssetRecord({
     id: data.assetId ? `asset-${data.assetId}` : `asset-${Date.now()}`,
@@ -2111,14 +2128,34 @@ function dataUrlToFile(dataUrl, fallbackName = "asset") {
   return new File([bytes], safeName, { type: mimeType });
 }
 
-async function uploadDataUrlAsset(dataUrl, name, assetType, altText) {
+async function uploadDataUrlAsset(
+  dataUrl,
+  name,
+  assetType,
+  altText,
+  onProgress = () => {},
+) {
   const file = dataUrlToFile(dataUrl, name || assetType);
+  onProgress(`Đang gửi ${file.name} (${formatStorageBytes(file.size)})...`, {
+    type: "asset-start",
+    fileName: file.name,
+    sizeBytes: file.size,
+    assetType,
+  });
   const asset = await apiUploadAssetFile(
     file,
     assetType,
     altText,
     false,
   );
+  onProgress(`Đã upload ${file.name}`, {
+    type: "asset-done",
+    fileName: file.name,
+    sizeBytes: file.size,
+    assetType,
+    url: asset.src,
+    advance: 1,
+  });
   return asset.src;
 }
 
@@ -2219,6 +2256,52 @@ async function createCourseMediaUploadContext() {
   return { localAssets, backendAssets };
 }
 
+function countUploadableCourseMedia(course, assetRecords = state.assets) {
+  let total = isDataUrl(course.thumbnail) ? 1 : 0;
+  for (const level of course.levels || []) {
+    for (const lesson of level.lessons || []) {
+      for (const block of lesson.blocks || []) {
+        if (
+          getUploadableMediaSource(block, "src", "assetId", assetRecords)
+        ) {
+          total += 1;
+        }
+        if (
+          getUploadableMediaSource(
+            block,
+            "imageSrc",
+            "imageAssetId",
+            assetRecords,
+          )
+        ) {
+          total += 1;
+        }
+        if (
+          getUploadableMediaSource(block, "url", "videoAssetId", assetRecords)
+        ) {
+          total += 1;
+        }
+      }
+    }
+  }
+  return total;
+}
+
+function estimatePublishAllUploadSteps() {
+  const courses = state.customCourses.filter(
+    (course) => Array.isArray(course.levels) && course.levels.length,
+  );
+  const mediaSteps = courses.reduce(
+    (sum, course) => sum + countUploadableCourseMedia(course),
+    0,
+  );
+  return {
+    courseCount: courses.length,
+    mediaSteps,
+    totalSteps: Math.max(1, 1 + mediaSteps + courses.length),
+  };
+}
+
 function cloneCourseForMediaUpload(course) {
   return {
     ...course,
@@ -2253,6 +2336,7 @@ async function uploadEmbeddedCourseMedia(
       nextCourse.thumbnailName || `${nextCourse.id}-thumbnail`,
       "course-thumbnail",
       nextCourse.title,
+      onProgress,
     );
     uploadedCount += 1;
   }
@@ -2284,6 +2368,7 @@ async function uploadEmbeddedCourseMedia(
             block.fileName || block.title || "lesson-image",
             "lesson-image",
             block.alt || block.title || lesson.title,
+            onProgress,
           );
           uploadedCount += 1;
         }
@@ -2317,6 +2402,7 @@ async function uploadEmbeddedCourseMedia(
             block.imageName || block.title || "lesson-inline-image",
             "lesson-inline-image",
             getInlineImageAlt(block),
+            onProgress,
           );
           uploadedCount += 1;
         }
@@ -2344,6 +2430,7 @@ async function uploadEmbeddedCourseMedia(
             block.videoFileName || block.title || "lesson-video",
             "lesson-video",
             block.title || lesson.title,
+            onProgress,
           );
           uploadedCount += 1;
         }
@@ -2377,6 +2464,10 @@ async function publishLocalCourseToBackend(
     slugify(preparedCourse.id || preparedCourse.title) ||
     slugify(preparedCourse.title) ||
     `course-${Date.now()}`;
+  onProgress(`Đang lưu course: ${preparedCourse.title}`, {
+    type: "course-save-start",
+    courseTitle: preparedCourse.title,
+  });
   const data = await apiRequest("courses.php", {
     method: "POST",
     body: JSON.stringify({
@@ -2389,6 +2480,11 @@ async function publishLocalCourseToBackend(
       status,
       levels: preparedCourse.levels || [],
     }),
+  });
+  onProgress(`Đã lưu course: ${preparedCourse.title}`, {
+    type: "course-save-done",
+    courseTitle: preparedCourse.title,
+    advance: 1,
   });
   preparedCourse.status = data.status || status;
   preparedCourse.backendCourseId =
@@ -2413,7 +2509,14 @@ async function publishAllLocalCoursesToBackend(onProgress = () => {}) {
   if (!courseIds.length) {
     throw new Error("Chưa có bài học local nào để upload.");
   }
+  onProgress("Đang tải asset metadata từ backend...", {
+    type: "metadata-start",
+  });
   const assetContext = await createCourseMediaUploadContext();
+  onProgress("Đã tải asset metadata từ backend.", {
+    type: "metadata-done",
+    advance: 1,
+  });
   const results = [];
   for (const [index, courseId] of courseIds.entries()) {
     const course = state.customCourses.find((item) => item.id === courseId);
@@ -6332,6 +6435,98 @@ function drawAdminAccountPage(panel) {
   panel.remove();
 }
 
+function formatUploadError(error) {
+  const parts = [
+    error?.status ? `HTTP ${error.status}` : "",
+    error?.code || "",
+    error?.message || "Lỗi không xác định",
+    error?.hint ? `Hint: ${error.hint}` : "",
+    error?.detail ? `Detail: ${error.detail}` : "",
+  ].filter(Boolean);
+  return parts.join(" - ");
+}
+
+function createUploadProgressController(panel, totalSteps = 1) {
+  const progressPanel = panel.querySelector("#adminUploadProgressPanel");
+  const fill = panel.querySelector("#adminUploadProgressFill");
+  const percentText = panel.querySelector("#adminUploadProgressPercent");
+  const stepText = panel.querySelector("#adminUploadProgressSteps");
+  const currentText = panel.querySelector("#adminUploadProgressCurrent");
+  const log = panel.querySelector("#adminUploadProgressLog");
+  let completed = 0;
+  let total = Math.max(1, Number(totalSteps) || 1);
+
+  const render = () => {
+    const percent = Math.max(
+      0,
+      Math.min(100, Math.round((completed / total) * 100)),
+    );
+    if (fill) fill.style.width = `${percent}%`;
+    if (percentText) percentText.textContent = `${percent}%`;
+    if (stepText) stepText.textContent = `${completed}/${total} bước`;
+    return percent;
+  };
+
+  const addLog = (message, type = "info", meta = {}) => {
+    if (!log) return;
+    const item = document.createElement("li");
+    item.className = `upload-log-item ${type}`;
+    const detail = [
+      meta.fileName,
+      meta.sizeBytes ? formatStorageBytes(meta.sizeBytes) : "",
+      meta.url ? meta.url : "",
+    ].filter(Boolean);
+    item.innerHTML = `
+      <span>${escapeHtml(new Date().toLocaleTimeString())}</span>
+      <strong>${escapeHtml(message)}</strong>
+      ${detail.length ? `<small>${escapeHtml(detail.join(" - "))}</small>` : ""}
+    `;
+    log.prepend(item);
+  };
+
+  return {
+    start(plan = {}) {
+      total = Math.max(1, Number(plan.totalSteps) || total);
+      completed = 0;
+      if (progressPanel) progressPanel.hidden = false;
+      if (log) log.innerHTML = "";
+      if (currentText) {
+        currentText.textContent = `Chuẩn bị upload ${plan.courseCount || 0} course, ${plan.mediaSteps || 0} media.`;
+      }
+      addLog("Bắt đầu upload data local lên web", "info", plan);
+      return render();
+    },
+    note(message, meta = {}) {
+      if (meta.advance) {
+        completed = Math.min(total, completed + Number(meta.advance));
+      }
+      const percent = render();
+      if (currentText) currentText.textContent = message;
+      addLog(message, meta.advance ? "success" : "info", meta);
+      return percent;
+    },
+    complete(message) {
+      completed = total;
+      const percent = render();
+      if (currentText) currentText.textContent = message;
+      addLog(message, "success");
+      return percent;
+    },
+    fail(error) {
+      const message = formatUploadError(error);
+      render();
+      if (currentText) currentText.textContent = message;
+      addLog(message, "error", {
+        fileName: error?.code || "",
+      });
+      return message;
+    },
+    percent() {
+      return render();
+    },
+  };
+}
+
 function drawPlatformAdminSettingsPanel(root) {
   const panel = root.querySelector("#platformAdminSettingsPanel");
   if (!panel) return;
@@ -6377,6 +6572,17 @@ function drawPlatformAdminSettingsPanel(root) {
         <button class="ghost-button" type="button" id="adminPublishLocalCoursesButton" ${state.customCourses.length ? "" : "disabled"}>Upload data</button>
       </div>
       <div class="import-status" id="adminLocalCoursePublishStatus" aria-live="polite"></div>
+      <div class="upload-progress-panel" id="adminUploadProgressPanel" hidden>
+        <div class="upload-progress-topline">
+          <strong id="adminUploadProgressPercent">0%</strong>
+          <span id="adminUploadProgressSteps">0/0 bước</span>
+        </div>
+        <div class="upload-progress-bar" aria-hidden="true">
+          <span id="adminUploadProgressFill"></span>
+        </div>
+        <div class="upload-progress-current" id="adminUploadProgressCurrent">Chưa chạy upload.</div>
+        <ol class="upload-progress-log" id="adminUploadProgressLog"></ol>
+      </div>
     </div>
     <div class="account-section-block admin-media-cleanup-block">
       <div class="compact-heading">
@@ -6457,14 +6663,21 @@ function drawPlatformAdminSettingsPanel(root) {
     .querySelector("#adminPublishLocalCoursesButton")
     ?.addEventListener("click", async () => {
       const status = panel.querySelector("#adminLocalCoursePublishStatus");
+      const plan = estimatePublishAllUploadSteps();
+      const progress = createUploadProgressController(panel, plan.totalSteps);
+      progress.start(plan);
       status.textContent = "Đang upload data local lên web...";
       try {
-        const results = await publishAllLocalCoursesToBackend((message) => {
-          status.textContent = message;
+        const results = await publishAllLocalCoursesToBackend((message, meta) => {
+          const percent = progress.note(message, meta);
+          status.textContent = `${percent}% - ${message}`;
         });
-        status.textContent = `Đã upload và publish ${results.length} course lên web.`;
+        const doneMessage = `Đã upload và publish ${results.length} course lên web.`;
+        progress.complete(doneMessage);
+        status.textContent = doneMessage;
       } catch (error) {
-        status.textContent = `Upload lỗi: ${error.message}`;
+        const detail = progress.fail(error);
+        status.textContent = `Upload lỗi: ${detail}`;
       }
     });
   loadAdminUsers(panel);

@@ -323,13 +323,23 @@ const checks = [
   {
     name: "Deploy cache bust token is current",
     pass: () =>
-      read("app/index.html").includes("styles.css?v=20260714-cloudinary-media1") &&
+      read("app/index.html").includes("styles.css?v=20260714-upload-progress1") &&
       read("app/index.html").includes(
         "studyflow-resend.css?v=20260713-resend2",
       ) &&
       read("app/index.html").includes(
-        "app.js?v=20260714-cloudinary-media1",
+        "app.js?v=20260714-upload-progress1",
       ),
+  },
+  {
+    name: "Settings shows upload progress and API error detail",
+    pass: () =>
+      read("app/app.js").includes("function createUploadProgressController") &&
+      read("app/app.js").includes("estimatePublishAllUploadSteps") &&
+      read("app/app.js").includes("adminUploadProgressPanel") &&
+      read("app/app.js").includes("formatUploadError") &&
+      read("app/styles.css").includes(".upload-progress-bar") &&
+      read("app/styles.css").includes(".upload-log-item.error"),
   },
   {
     name: "Marketing landing uses real scaled layout instead of browser zoom",

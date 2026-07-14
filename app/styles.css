@@ -2634,6 +2634,91 @@ textarea {
   line-height: 1.5;
 }
 
+.upload-progress-panel {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  background: var(--canvas);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.upload-progress-panel[hidden] {
+  display: none;
+}
+
+.upload-progress-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink);
+}
+
+.upload-progress-topline strong {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.upload-progress-topline span,
+.upload-progress-current {
+  color: var(--muted);
+}
+
+.upload-progress-bar {
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--hairline) 70%, transparent);
+  overflow: hidden;
+}
+
+.upload-progress-bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #55d6a7, #2f80ed);
+  transition: width 180ms ease;
+}
+
+.upload-progress-log {
+  display: grid;
+  gap: 8px;
+  max-height: 240px;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.upload-log-item {
+  border: 1px solid var(--hairline);
+  border-left: 4px solid #8a93a6;
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  display: grid;
+  gap: 3px;
+}
+
+.upload-log-item.success {
+  border-left-color: #25a36f;
+}
+
+.upload-log-item.error {
+  border-left-color: #d84a4a;
+  background: #fff4f2;
+}
+
+.upload-log-item span,
+.upload-log-item small {
+  color: var(--muted);
+}
+
+.upload-log-item strong,
+.upload-log-item small {
+  overflow-wrap: anywhere;
+}
+
 .admin-media-cleanup-actions {
   display: flex;
   flex-wrap: wrap;
